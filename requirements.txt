@@ -1,3 +1,2 @@
 streamlit-webrtc
-cv2
-av
+opencv-python
