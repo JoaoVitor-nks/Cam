@@ -1,30 +1,29 @@
-import cv2
 import streamlit as st
+from streamlit_webrtc import webrtc_streamer, WebRtcMode, ClientSettings
 
-cap = cv2.VideoCapture(0)
+st.title("Ligação por Vídeo no Streamlit")
 
-st.title('Projeto Cam')
+# Configurações do WebRTC
+RTC_CONFIGURATION = {
+    "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]  # Servidor STUN
+}
 
-frame_placeholder = st.empty()
+# Escolha o papel do usuário: Host ou Participante
+role = st.radio("Escolha o papel:", ["Host", "Participante"], horizontal=True)
 
-stop_button = st.button('Stop')
-
-
-while cap.isOpened() and not stop_button:
-
-    ret, frame = cap.read()
-
-    if not ret:
-        st.write("O video acabou")
-        break
-
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-    frame_placeholder.image(frame, channels='RGB')
-
-    if cv2.waitKey(1) & 0xFF == ord('q') or stop_button:
-        break
-
-
-cap.release()
-
+if role == "Host":
+    st.subheader("Você é o Host. Espere pelo Participante.")
+    webrtc_streamer(
+        key="host",
+        mode=WebRtcMode.SENDRECV,  # Envia e recebe áudio/vídeo
+        rtc_configuration=RTC_CONFIGURATION,
+        media_stream_constraints={"video": True, "audio": True},
+    )
+elif role == "Participante":
+    st.subheader("Você é o Participante. Conecte-se ao Host.")
+    webrtc_streamer(
+        key="guest",
+        mode=WebRtcMode.SENDRECV,  # Envia e recebe áudio/vídeo
+        rtc_configuration=RTC_CONFIGURATION,
+        media_stream_constraints={"video": True, "audio": True},
+    )
