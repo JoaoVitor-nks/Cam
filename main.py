@@ -1,23 +1,30 @@
 import cv2
+import streamlit as st
 
-cap = cv2.VideoCapture(0)  # Tente com o índice 0
+cap = cv2.VideoCapture(1)
 
-if not cap.isOpened():
-    print("Não foi possível acessar a câmera.")
-else:
-    print("Câmera acessada com sucesso!")
+st.title('Projeto Cam')
 
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            print("Não foi possível capturar o frame.")
-            break
+frame_placeholder = st.empty()
 
-        cv2.imshow("Câmera", frame)
+stop_button = st.button('Stop')
 
-        # Pressione 'q' para sair
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+
+while cap.isOpened() and not stop_button:
+
+    ret, frame = cap.read()
+
+    if not ret:
+        st.write("O video acabou")
+        break
+
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    frame_placeholder.image(frame, channels='RGB')
+
+    if cv2.waitKey(1) & 0xFF == ord('q') or stop_button:
+        break
+
 
 cap.release()
 
