@@ -1,22 +1,31 @@
+import cv2
 import streamlit as st
-from streamlit_webrtc import webrtc_streamer, WebRtcMode
+import numpy as np
+import tempfile
 
-st.title("Teste de Câmera com WebRTC")
+cap = cv2.VideoCapture(1)
 
-# Configuração do WebRTC
-RTC_CONFIGURATION = {
-    "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}],  # Servidor STUN
-}
+st.title('Projeto Cam')
 
-MEDIA_STREAM_CONSTRAINTS = {
-    "video": True,  # Habilita o feed de vídeo
-    "audio": False,  # Desabilita o áudio para simplificar
-}
+frame_placeholder = st.empty()
 
-# Inicialização do WebRTC
-webrtc_streamer(
-    key="camera-stream",
-    mode=WebRtcMode.SENDONLY,  # Apenas envia o feed de vídeo
-    rtc_configuration=RTC_CONFIGURATION,
-    media_stream_constraints=MEDIA_STREAM_CONSTRAINTS,
-)
+stop_button = st.button('Stop')
+
+while cap.isOpened() and not stop_button:
+
+    ret, frame = cap.read()
+
+    if not ret:
+        st.write("O video acabou")
+        break
+
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    frame_placeholder.image(frame, channels='RGB')
+
+    if cv2.waitKey(1) & 0xFF == ord('q') or stop_button:
+        break
+
+
+cap.release()
+cv2.destroyAllWindows()
