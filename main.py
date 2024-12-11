@@ -4,7 +4,7 @@ import streamlit as st
 st.title("Projeto Cam - OpenCV e Streamlit")
 
 # Inicialize a câmera
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 if not cap.isOpened():
     st.error("Não foi possível acessar a câmera.")
 else:
