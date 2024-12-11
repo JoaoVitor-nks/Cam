@@ -1,33 +1,23 @@
 import cv2
-import streamlit as st
 
-st.title("Projeto Cam - OpenCV e Streamlit")
+cap = cv2.VideoCapture(0)  # Tente com o índice 0
 
-# Inicialize a câmera
-cap = cv2.VideoCapture(2)
 if not cap.isOpened():
-    st.error("Não foi possível acessar a câmera.")
+    print("Não foi possível acessar a câmera.")
 else:
-    st.success("Câmera acessada com sucesso!")
+    print("Câmera acessada com sucesso!")
 
-# Placeholder para o feed de vídeo
-frame_placeholder = st.empty()
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            print("Não foi possível capturar o frame.")
+            break
 
-# Botão para parar o feed
-stop = st.button("Parar Feed")
+        cv2.imshow("Câmera", frame)
 
-# Loop para capturar frames
-while cap.isOpened() and not stop:
-    ret, frame = cap.read()
-    if not ret:
-        st.warning("Não foi possível capturar o frame. Encerrando...")
-        break
-
-    # Converte o frame para RGB
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-    # Exibe o frame no Streamlit
-    frame_placeholder.image(frame, channels="RGB")
+        # Pressione 'q' para sair
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
 cap.release()
-st.info("Feed encerrado.")
+cv2.destroyAllWindows()
