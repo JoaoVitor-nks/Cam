@@ -1,43 +1,33 @@
 import cv2
 import streamlit as st
+import numpy as np
+import tempfile
 
-st.title("Projeto Cam - Streamlit com OpenCV")
 
-# Escolha do dispositivo de captura
-device_index = st.selectbox("Selecione a câmera:", [0, 1], index=0)
+cap = cv2.VideoCapture(0)
 
-# Botão para iniciar e parar o vídeo
-start_button = st.button("Iniciar")
-stop_button = st.button("Parar")
+st.title('Projeto Cam')
 
-frame_placeholder = st.empty()  # Placeholder para exibir os frames
+frame_placeholder = st.empty()
 
-if start_button:
-    cap = cv2.VideoCapture(device_index)  # Inicia o dispositivo de captura
-    if not cap.isOpened():
-        st.error("Não foi possível acessar a câmera.")
-    else:
-        st.info("Pressione o botão 'Parar' para encerrar o vídeo.")
-        
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                st.warning("Não foi possível capturar o frame.")
-                break
+stop_button = st.button('Stop')
 
-            # Conversão para RGB
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-            # Exibir o frame no Streamlit
-            frame_placeholder.image(frame, channels="RGB")
+while cap.isOpened() and not stop_button:
 
-            # Interrompe o loop se o botão 'Parar' for clicado
-            if st.session_state.get('stop', False):
-                break
+    ret, frame = cap.read()
 
-        cap.release()  # Libera a câmera
-        cv2.destroyAllWindows()  # Fecha janelas abertas pelo OpenCV
+    if not ret:
+        st.write("O video acabou")
+        break
 
-if stop_button:
-    st.session_state['stop'] = True
-    st.info("O vídeo foi interrompido.")
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    frame_placeholder.image(frame, channels='RGB')
+
+    if cv2.waitKey(1) & 0xFF == ord('q') or stop_button:
+        break
+
+
+cap.release()
+
